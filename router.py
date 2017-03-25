@@ -23,7 +23,7 @@ class Router:
     def get_router(self, nid):
         # Compute the appropriate router for the nid
         # Probably replace with a mongo table
-        return "cori.nersc.gov"
+        return "gerty-sdn"
 
     def available(self):
         addresses = []
