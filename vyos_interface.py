@@ -16,10 +16,14 @@ class vyosInterface:
           fourth += 1
         return "10.128.%d.%d" % ( third, fourth)
 
+    def get_rule(self, address):
+        last = int(address.split('.')[3])
+        return last+40
+
     def add_nat(self, nid, router, address):
         # Mock stubs
         # do update
-        rule = 50
+        rule = self.get_rule(address)
         int_add = self.nid_to_int_address(nid)
         interface = "bond1"
         vif = 224
@@ -63,7 +67,7 @@ class vyosInterface:
 
     def remove_nat(self, nid, router, address):
         # Mock stubs
-        rule = 50
+        rule = self.get_rule(address)
         interface = "bond1"
         vif = 224
         print "Remove NAT"
