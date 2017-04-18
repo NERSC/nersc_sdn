@@ -5,7 +5,7 @@ import pexpect
 
 class vyosInterface:
     def __init__(self):
-        self.user = "canon"
+        self.user = "sdn"
         self.prompt = self.user+"@.*$"
         print "Initializing VYOS Interface"
 
