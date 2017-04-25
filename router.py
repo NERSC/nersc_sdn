@@ -36,7 +36,7 @@ class Router:
         # Compute the appropriate router for the ip
         # Probably replace with a mongo table
         if ip not in self.map:
-            return None
+            raise ValueError('Bad IP')
         return self.map[ip]
 
     def available(self):
@@ -55,6 +55,9 @@ class Router:
     def associate(self, session):
         # allocate an address and assocaite it with ip
         ip = session['ip']
+        router = self._get_router(ip)
+        if router is None:
+            raise ValueError('Invalid IP')
         rec = self.routes.find_one({'ip': ip})
         if rec is not None:
             print "Already mapped"
@@ -64,9 +67,6 @@ class Router:
             print "No available addresses found"
             return None
         address = rec['address']
-        router = self._get_router(ip)
-        if router is None:
-            raise ValueError('Invalid IP')
         update = {
             'status': ASSIGNING,
             'ip': ip,

@@ -15,16 +15,27 @@ class APITestCase(unittest.TestCase):
         self.initdb()
         os.environ['SDN_SETTINGS'] = "./test/settings.ini"
         import sdnapi
-        self.auth = "good:root:root::0:0:nid0001:10.128.0.1"
-        self.headers = {'authentication': self.auth}
-        badauth = "bad:root:root::0:0:nid0001:10.128.0.1"
-        self.badheaders = {'authentication': badauth}
-        bogusauth = "bad:root:root::0:0:nid0001:10.128.1.1"
-        self.bogusheaders = {'authentication': bogusauth}
+        astr = "good:root:root::0:0:nid0001:10.128.0.1"
+        self.allowed = {'authentication': astr}
+
+        astr = "bad:root:root::0:0:nid0001:10.128.0.1"
+        self.badauth = {'authentication': astr}
+
+        astr = "good:user:user::500:500:nid0001:10.128.0.1"
+        self.unallowed = {'authentication': astr}
+
+        astr = "good:root:root::0:0:nid0001:10.128.1.1"
+        self.bogusip = {'authentication': astr}
+
         self.app = sdnapi.application.test_client()
 
     def initdb(self):
         init('localhost', '1.2.3', 4, 4)
+
+    def test_testauth(self):
+        from sdnapi import is_allowed
+        status = is_allowed({})
+        self.assertEquals(status, False)
 
     def test_hello(self):
         rv = self.app.get('/')
@@ -35,30 +46,48 @@ class APITestCase(unittest.TestCase):
         self.assertEquals(rv.status_code, 200)
 
     def test_addresses(self):
-        rv = self.app.get('/addresses/')
+        rv = self.app.get('/addresses/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
+        rv = self.app.get('/addresses/', headers=self.badauth)
+        self.assertEquals(rv.status_code, 404)
+
+        rv = self.app.get('/addresses/', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
+
     def test_status(self):
-        rv = self.app.get('/status/')
+        rv = self.app.get('/status/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
+
+        rv = self.app.get('/status/', headers=self.badauth)
+        self.assertEquals(rv.status_code, 404)
+
+        rv = self.app.get('/status/', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
 
     def test_associate(self):
         self.initdb()
-        rv = self.app.get('/associate/', headers=self.headers)
+        rv = self.app.get('/associate/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/associate/', headers=self.bogusheaders)
+        rv = self.app.get('/associate/', headers=self.bogusip)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.get('/associate/10.128.0.1', headers=self.headers)
+        rv = self.app.get('/associate/10.128.0.1', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
         rv = self.app.get('/associate/10.128.1.1')
         self.assertEquals(rv.status_code, 404)
 
         self.initdb()
-        rv = self.app.get('/associate/10.128.0.1', headers=self.badheaders)
+        rv = self.app.get('/associate/10.128.0.1', headers=self.badauth)
         self.assertEquals(rv.status_code, 404)
+
+        rv = self.app.get('/associate/', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
+
+        rv = self.app.get('/associate/10.128.0.1', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
 
     def test_release(self):
         self.routes.remove({})
@@ -70,17 +99,23 @@ class APITestCase(unittest.TestCase):
             'status': 'used'
         }
         self.routes.insert(rec)
-        rv = self.app.get('/release/', headers=self.headers)
+        rv = self.app.get('/release/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/10.128.0.1', headers=self.headers)
+        rv = self.app.get('/release/10.128.0.1', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/', headers=self.bogusheaders)
-        self.assertEquals(rv.status_code, 404)
+        rv = self.app.get('/release/', headers=self.bogusip)
+        self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/10.128.0.1', headers=self.bogusheaders)
-        self.assertEquals(rv.status_code, 404)
+        rv = self.app.get('/release/10.128.0.1', headers=self.bogusip)
+        self.assertEquals(rv.status_code, 200)
+
+        rv = self.app.get('/release/', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
+
+        rv = self.app.get('/release/10.128.0.1', headers=self.unallowed)
+        self.assertEquals(rv.status_code, 401)
 
 
 if __name__ == '__main__':

@@ -12,14 +12,14 @@ application.config['DBHOST'] = 'localhost'
 application.config['RTRUSER'] = 'sdn'
 application.config['MAPFILE'] = './mapfile'
 application.config['AUTHMODE'] = 'munge'
+application.config['ALLOWED'] = [0]
 
 if 'SDN_SETTINGS' in os.environ:
     application.logger.info("Loading settings from " +
                             os.environ['SDN_SETTINGS'])
     application.config.from_envvar('SDN_SETTINGS')
 
-application.logger.info(application.config)
-print application.config
+application.logger.debug(application.config)
 
 router = router.Router(application.config)
 
@@ -31,6 +31,14 @@ AUTH_HEADER = 'authentication'
 @application.route("/")
 def hello():
     return "/{associate,release}"
+
+
+def is_allowed(session):
+    if 'uid' not in session:
+        return False
+    if session['uid'] in application.config['ALLOWED']:
+        return True
+    return False
 
 
 @application.errorhandler(404)
@@ -47,6 +55,17 @@ def not_found(error=None):
     return resp
 
 
+def unauthorized(error=None):
+    message = {
+        'status': 401,
+        'error': str(error),
+        'message': 'Not Found: ' + request.url,
+    }
+    resp = jsonify(message)
+    resp.status_code = 401
+    return resp
+
+
 @application.route("/_ping")
 def ping():
     return ''
@@ -58,6 +77,8 @@ def associate():
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
+        if not is_allowed(session):
+            return unauthorized()
         address = router.associate(session)
     except:
         return not_found()
@@ -72,8 +93,8 @@ def associateip(ip):
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
-        if 'uid' not in session:
-            raise ValueError("Missing UID")
+        if not is_allowed(session):
+            return unauthorized()
         session['ip'] = ip
         address = router.associate(session)
     except:
@@ -89,6 +110,8 @@ def release():
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
+        if not is_allowed(session):
+            return unauthorized()
         status = router.release(session['ip'])
     except:
         return not_found()
@@ -103,8 +126,8 @@ def releaseip(ip):
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
-        if 'uid' not in session:
-            raise ValueError("Missing UID")
+        if not is_allowed(session):
+            return unauthorized()
         status = router.release(ip)
     except:
         return not_found()
@@ -117,6 +140,10 @@ def releaseip(ip):
 def list_addresses():
     resp = {}
     try:
+        authstr = request.headers.get(AUTH_HEADER)
+        session = auth_handler.authenticate(authstr)
+        if not is_allowed(session):
+            return unauthorized()
         addrs = router.available()
     except:
         return not_found()
@@ -127,14 +154,16 @@ def list_addresses():
 
 @application.route("/status/")
 def status():
-    resp = {}
+    status = {}
     try:
-        addrs = router.status()
+        authstr = request.headers.get(AUTH_HEADER)
+        session = auth_handler.authenticate(authstr)
+        if not is_allowed(session):
+            return unauthorized()
+        status = router.status()
     except:
         return not_found()
-
-    resp['available'] = addrs
-    return jsonify(resp)
+    return jsonify(status)
 
 
 if __name__ == "__main__":

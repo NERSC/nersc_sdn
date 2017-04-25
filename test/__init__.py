@@ -8,5 +8,5 @@ def setup():
     # Create __init__
 
 def teardown():
-    os.unlink('ssh.out')
-
+    if os.path.exists('ssh.out'):
+        os.unlink('ssh.out')
