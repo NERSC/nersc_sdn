@@ -17,6 +17,9 @@ def init(db, base, imin, imax):
             'ip': None,
             'router': None,
             'last_associated': None,
+            'end_time': None,
+            'user': None,
+            'jobid': None,
             'status': 'available'
         }
         routes.insert(rec)

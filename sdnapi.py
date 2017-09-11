@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request
 import router
 import auth
 import os
+import json
 
 application = Flask(__name__)
 pp = pprint.PrettyPrinter(indent=4)
@@ -71,15 +72,21 @@ def ping():
     return ''
 
 
-@application.route("/associate/")
+@application.route("/associate/", methods=["POST"])
 def associate():
     resp = {}
+    try:
+        rqd = request.get_data()
+        data = json.loads(rqd)
+    except:
+        application.logger.warn("Unable to parse pull data '%s'" % (rqd))
+        return not_found()
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
         if not is_allowed(session):
             return unauthorized()
-        address = router.associate(session)
+        address = router.associate(session, data)
     except:
         return not_found()
 
@@ -87,16 +94,22 @@ def associate():
     return jsonify(resp)
 
 
-@application.route("/associate/<ip>")
+@application.route("/associate/<ip>", methods=["POST"])
 def associateip(ip):
     resp = {}
+    try:
+        rqd = request.get_data()
+        data = json.loads(rqd)
+    except:
+        application.logger.warn("Unable to parse pull data '%s'" % (rqd))
+        return not_found(error='Bad data block')
     try:
         authstr = request.headers.get(AUTH_HEADER)
         session = auth_handler.authenticate(authstr)
         if not is_allowed(session):
             return unauthorized()
         session['ip'] = ip
-        address = router.associate(session)
+        address = router.associate(session, data)
     except:
         return not_found()
 

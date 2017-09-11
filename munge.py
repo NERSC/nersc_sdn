@@ -23,6 +23,7 @@ Helper routines for munge
 
 import sys
 from subprocess import Popen, PIPE
+DEBUG = False
 
 
 def munge(text, socket=None):
@@ -82,7 +83,8 @@ def unmunge(encoded, socket=None):
         resp['MESSAGE'] = message
         return resp
     except:
-        print sys.exc_value
+        if DEBUG:
+            print sys.exc_value
         raise
 
 

@@ -87,7 +87,6 @@ class Authentication(object):
                    'uid': int(uid), 'gid': int(gid),
                    'host': host, 'ip': ip}
         else:
-            print len(auth)
             raise OSError('Bad AuthString')
 
         if status != 'good':

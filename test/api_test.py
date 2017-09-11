@@ -3,6 +3,8 @@
 
 import unittest
 import os
+import json
+from time import time
 from pymongo import MongoClient
 from initdb import init
 
@@ -29,6 +31,11 @@ class APITestCase(unittest.TestCase):
 
         self.app = sdnapi.application.test_client()
 
+        self.data = {'user': 'auser',
+                     'end_time': time()+60,
+                     'jobid': '1234'
+                     }
+
     def initdb(self):
         init('localhost', '1.2.3', 4, 4)
 
@@ -46,6 +53,9 @@ class APITestCase(unittest.TestCase):
         self.assertEquals(rv.status_code, 200)
 
     def test_addresses(self):
+        """
+        Test address call
+        """
         rv = self.app.get('/addresses/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
@@ -56,6 +66,10 @@ class APITestCase(unittest.TestCase):
         self.assertEquals(rv.status_code, 401)
 
     def test_status(self):
+        """
+        Test status call
+        """
+
         rv = self.app.get('/status/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
@@ -66,27 +80,37 @@ class APITestCase(unittest.TestCase):
         self.assertEquals(rv.status_code, 401)
 
     def test_associate(self):
+        """
+        Test various associate  modes
+        """
         self.initdb()
-        rv = self.app.get('/associate/', headers=self.allowed)
+        d = json.dumps(self.data)
+        good = self.allowed
+        bad = self.badauth
+        unallowed = self.unallowed
+        rv = self.app.post('/associate/', headers=good, data=d)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/associate/', headers=self.bogusip)
+        rv = self.app.post('/associate/', headers=self.bogusip, data=d)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.get('/associate/10.128.0.1', headers=self.allowed)
+        rv = self.app.post('/associate/10.128.0.1', headers=good, data=d)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/associate/10.128.1.1')
+        rv = self.app.post('/associate/10.128.1.1', data=d)
+        self.assertEquals(rv.status_code, 404)
+
+        rv = self.app.post('/associate/10.128.0.1', headers=good)
         self.assertEquals(rv.status_code, 404)
 
         self.initdb()
-        rv = self.app.get('/associate/10.128.0.1', headers=self.badauth)
+        rv = self.app.post('/associate/10.128.0.1', headers=bad, data=d)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.get('/associate/', headers=self.unallowed)
+        rv = self.app.post('/associate/', headers=unallowed, data=d)
         self.assertEquals(rv.status_code, 401)
 
-        rv = self.app.get('/associate/10.128.0.1', headers=self.unallowed)
+        rv = self.app.post('/associate/10.128.0.1', headers=unallowed, data=d)
         self.assertEquals(rv.status_code, 401)
 
     def test_release(self):

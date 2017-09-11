@@ -2,6 +2,7 @@
 from pymongo import MongoClient
 import time
 import vyos_interface
+import logging
 
 USED = "used"
 AVAILABLE = "available"
@@ -11,7 +12,7 @@ RELEASING = "releasing"
 
 class Router:
     def __init__(self, settings):
-        print "Initializing Router"
+        logging.debug("Initializing Router")
         dbhost = settings['DBHOST']
         user = settings['RTRUSER']
         mapfile = settings['MAPFILE']
@@ -52,25 +53,35 @@ class Router:
             resp.append(rec)
         return resp
 
-    def associate(self, session):
+    def check_data(self, data):
+        required = ['user', 'end_time', 'jobid']
+        for f in required:
+            if f not in data:
+                raise ValueError('Missing %s' % (f))
+
+    def associate(self, session, data):
         # allocate an address and assocaite it with ip
         ip = session['ip']
         router = self._get_router(ip)
+        self.check_data(data)
         if router is None:
             raise ValueError('Invalid IP')
         rec = self.routes.find_one({'ip': ip})
         if rec is not None:
-            print "Already mapped"
+            logging.warn("Already mapped")
             return rec['address']
         rec = self.routes.find_one({'status': AVAILABLE})
         if rec is None:
-            print "No available addresses found"
+            logging.warn("No available addresses found")
             return None
         address = rec['address']
         update = {
             'status': ASSIGNING,
             'ip': ip,
             'router': router,
+            'end_time': data['end_time'],
+            'user': data['user'],
+            'jobid': data['jobid'],
             'last_associated': time.time()
         }
         self.routes.update({'address': address}, {'$set': update})
