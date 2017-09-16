@@ -14,6 +14,7 @@ application.config['RTRUSER'] = 'sdn'
 application.config['MAPFILE'] = './mapfile'
 application.config['AUTHMODE'] = 'munge'
 application.config['ALLOWED'] = [0]
+application.config['JOBSURL'] = 'http://localhost:8000'
 
 if 'SDN_SETTINGS' in os.environ:
     application.logger.info("Loading settings from " +
@@ -27,6 +28,10 @@ router = router.Router(application.config)
 auth_mode = application.config['AUTHMODE']
 auth_handler = auth.Authentication({'authentication': auth_mode})
 AUTH_HEADER = 'authentication'
+
+
+def shutdown():
+    router.shutdown()
 
 
 @application.route("/")

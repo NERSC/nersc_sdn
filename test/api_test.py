@@ -30,11 +30,16 @@ class APITestCase(unittest.TestCase):
         self.bogusip = {'authentication': astr}
 
         self.app = sdnapi.application.test_client()
+        self.sdnapi = sdnapi
 
         self.data = {'user': 'auser',
                      'end_time': time()+60,
                      'jobid': '1234'
                      }
+
+    def tearDown(self):
+        self.sdfile = '/tmp/shutdown_sdn'
+        self.sdnapi.shutdown()
 
     def initdb(self):
         init('localhost', '1.2.3', 4, 4)

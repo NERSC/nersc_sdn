@@ -3,6 +3,10 @@ from pymongo import MongoClient
 import time
 import vyos_interface
 import logging
+import requests
+import json
+from multiprocessing.process import Process
+import os
 
 USED = "used"
 AVAILABLE = "available"
@@ -13,17 +17,66 @@ RELEASING = "releasing"
 class Router:
     def __init__(self, settings):
         logging.debug("Initializing Router")
-        dbhost = settings['DBHOST']
+        self.dbhost = settings['DBHOST']
+        self.poll = float(settings['POLLINTERVAL'])
+        self.agent = settings['JOBSURL']
         user = settings['RTRUSER']
         mapfile = settings['MAPFILE']
         self.map = self._load_mapfile(mapfile)
-        client = MongoClient(dbhost)
+        self.vyos = vyos_interface.vyosInterface(user)
+        self.cleanup_proc = Process(target=self.cleanup,
+                                    name='CleanupThread')
+        self.cleanup_proc.start()
+        client = MongoClient(self.dbhost)
         if client is None:
+            self.cleanup_proc.terminate()
             raise OSError('Failed to connect to Mongo')
         self.routes = client.sdn.routes
         if self.routes.find_one() is None:
+            self.cleanup_proc.terminate()
             raise OSError('DB not initialized')
-        self.vyos = vyos_interface.vyosInterface(user)
+
+    def shutdown(self):
+        self.cleanup_proc.terminate()
+
+    def cleanup(self):
+        client = MongoClient(self.dbhost)
+        if client is None:
+            raise OSError('Failed to connect to Mongo')
+        self.routes = client.sdn.routes
+        while True:
+            if os.path.exists("/tmp/shutdown_sdn"):
+                print "Shut down triggered"
+                return 0
+            # Look for expired jobs
+            now = time.time()
+            for route in self.routes.find({'end_time': {'$lt': now},
+                                           'status': 'used'}):
+                ip = route['ip']
+                logging.warn("route expired %s" % (ip))
+                self.release(ip)
+            # Get jobs, ignore failures
+            try:
+                running = self.get_jobs()
+                self.check_jobs(running)
+            except:
+                pass
+
+            time.sleep(self.poll)
+
+    def check_jobs(self, running):
+        for route in self.routes.find({'status': 'used'}):
+            # check job
+            if 'jobid' not in route:
+                continue
+            if route['jobid'] not in running:
+                jobid = route['jobid']
+                logging.warn("Job no longer running %s" % (jobid))
+                self.release(route['ip'])
+
+    def get_jobs(self):
+        r = requests.get(self.agent)
+        return json.loads(r.text)
 
     def _load_mapfile(self, mapfile):
         map = dict()

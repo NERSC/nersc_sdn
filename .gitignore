@@ -3,3 +3,5 @@
 .coverage
 coverage
 ./test/ssh
+./test/tbin/.munge.expired
+

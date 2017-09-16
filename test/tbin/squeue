@@ -1,0 +1,11 @@
+#!/bin/sh
+
+
+if [ -e /tmp/sqjobs ] ; then
+   cat /tmp/sqjobs
+else
+   echo 1234
+   echo 1235
+   echo 1236
+   echo 1237
+fi
