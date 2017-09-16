@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm ssh.out
+while true ; do
+  read -p "sdn@blah: " line
+  echo $line >> ssh.out 
+  #if [ $(echo $line|grep -c exit) -gt 0 ] ; then
+  #  exit
+  #fi
+done

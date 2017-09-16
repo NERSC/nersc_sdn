@@ -9,4 +9,4 @@ RUN \
 ADD . /src/ 
 
 WORKDIR /src
-#ENTRYPOINT [ '/src/login.py' ]
+ENTRYPOINT [ './sdnapi.py' ]

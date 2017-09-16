@@ -1,91 +1,81 @@
 #!/usr/bin/python
 
 import pexpect
-
+import os
+import logging
 
 class vyosInterface:
-    def __init__(self):
-        self.user = "sdn"
+    def __init__(self, user):
+        logging.debug("Initializing VYOS Interface")
+        self.user = user
         self.prompt = self.user+"@.*$"
-        print "Initializing VYOS Interface"
+        self.interface = "bond1"
+        self.vif = 224
 
-    def nid_to_int_address(self, nid):
-        third = nid/254
-        fourth = nid%254
-        if third>0:
-          fourth += 1
-        return "10.128.%d.%d" % ( third, fourth)
-
-    def get_rule(self, address):
+    def _get_rule(self, address):
         last = int(address.split('.')[3])
         return last+40
 
-    def add_nat(self, nid, router, address):
+    def _sendline(self, child, line):
+        child.sendline(line)
+        child.expect(self.prompt)
+
+    def add_nat(self, int_add, router, address):
         # Mock stubs
         # do update
-        rule = self.get_rule(address)
-        int_add = self.nid_to_int_address(nid)
-        interface = "bond1"
-        vif = 224
-        print "Adding NAT"
-        print "nid=%d router=%s address=%s rule=%d int_add=%s" % (nid, router, address, rule, int_add)
- 
-        child = pexpect.spawn('ssh %s@%s' % (self.user, router))
-        child.expect(self.prompt)
-        print "Got prompt"
-        child.sendline("configure")
-        child.expect(self.prompt)
-        child.sendline("set interfaces bonding %s vif %d address '%s/24'" % (interface, vif, address))
-        child.expect(self.prompt)
-        child.sendline("commit")
-        child.expect(self.prompt)
-        child.sendline("set nat destination rule %d description '1-to-1 NAT example'" % (rule))
-        child.expect(self.prompt)
-        child.sendline("set nat destination rule %d destination address '%s'" % (rule, address))
-        child.expect(self.prompt)
-        child.sendline("set nat destination rule %d inbound-interface '%s.%d'" % (rule, interface, vif))
-        child.expect(self.prompt)
-        print child.before
-        child.sendline("set nat destination rule %d translation address '%s'" % (rule, int_add))
-        child.expect(self.prompt)
-        child.sendline("set nat source rule %d description '1-to-1 NAT example'" % (rule))
-        child.expect(self.prompt)
-        child.sendline("set nat source rule %d outbound-interface '%s.%d'" % (rule, interface, vif))
-        child.expect(self.prompt)
-        child.sendline("set nat source rule %d source address '%s'" % (rule, int_add))
-        child.expect(self.prompt)
-        child.sendline("set nat source rule %d translation address '%s'" % (rule, address))
-        child.expect(self.prompt)
-        child.sendline("commit add nat")
-        child.expect(self.prompt)
-        print child.before
-        child.sendline("exit")
-        child.expect(self.prompt)
-        child.sendline("exit")
-        print child.before
+        if 'MOCK' in os.environ:
+            return True
+        rule = self._get_rule(address)
+        interface = self.interface
+        vif = self.vif
+        ("Adding NAT")
+        logging.debug("router=%s address=%s rule=%d int_add=%s" %
+              (router, address, rule, int_add))
+        p = pexpect.spawn('ssh %s@%s' % (self.user, router))
+        p.expect(self.prompt)
+        self._sendline(p, "configure")
+        # Add interface
+        self._sendline(p, "set interfaces bonding %s vif %d address '%s/24'"
+                       % (interface, vif, address))
+        self._sendline(p, "commit")
+        # Add destination route
+        prefix = "set nat destination rule %d" % (rule)
+        desc = "1-to-1 NAT for %s to %s" % (int_add, address)
+        self._sendline(p, "%s description '%s'" % (prefix, desc))
+        self._sendline(p, "%s destination address '%s'" % (prefix, address))
+        self._sendline(p, "%s inbound-interface '%s.%d'" %
+                       (prefix, interface, vif))
+        self._sendline(p, "%s translation address '%s'" % (prefix, int_add))
+        # Add source route
+        prefix = "set nat source rule %d" % (rule)
+        self._sendline(p, "%s description '%s'" % (prefix, desc))
+        self._sendline(p, "%s outbound-interface '%s.%d'" %
+                       (prefix, interface, vif))
+        self._sendline(p, "%s source address '%s'" % (prefix, int_add))
+        self._sendline(p, "%s translation address '%s'" % (prefix, address))
+        self._sendline(p, "commit add nat")
+        self._sendline(p, "exit")
+        p.sendline("exit")
         return True
 
-    def remove_nat(self, nid, router, address):
+    def remove_nat(self, router, address):
         # Mock stubs
-        rule = self.get_rule(address)
+        if 'MOCK' in os.environ:
+            return True
+
+        rule = self._get_rule(address)
         interface = "bond1"
-        vif = 224
-        print "Remove NAT"
-        print "nid=%d router=%s address=%s rule=%d" % (nid, router, address, rule)
-        child = pexpect.spawn('ssh %s@%s' % (self.user, router))
-        child.expect(self.prompt)
-        child.sendline("configure")
-        child.expect(self.prompt)
-        child.sendline("delete interfaces bonding %s vif %d address '%s/24'" % (interface, vif, address))
-        child.expect(self.prompt)
-        child.sendline("delete nat destination rule %d" % (rule))
-        child.expect(self.prompt)
-        child.sendline("delete nat source rule %d" % (rule))
-        child.expect(self.prompt)
-        child.sendline("commit remove nat")
-        child.expect(self.prompt)
-        print child.before
-        child.sendline("exit")
-        print child.before
-        child.sendline("exit")
+        vif = self.vif
+        logging.debug("Remove NAT")
+        logging.debug("router=%s address=%s rule=%d" % (router, address, rule))
+        p = pexpect.spawn('ssh %s@%s' % (self.user, router))
+        p.expect(self.prompt)
+        self._sendline(p, "configure")
+        self._sendline(p, "delete interfaces bonding %s vif %d address '%s/24'"
+                       % (interface, vif, address))
+        self._sendline(p, "delete nat destination rule %d" % (rule))
+        self._sendline(p, "delete nat source rule %d" % (rule))
+        self._sendline(p, "commit remove nat")
+        self._sendline(p, "exit")
+        p.sendline("exit")
         return True

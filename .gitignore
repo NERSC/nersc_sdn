@@ -1,1 +1,7 @@
 *.pyc
+./test/config
+.coverage
+coverage
+./test/ssh
+./test/tbin/.munge.expired
+
