@@ -2,7 +2,7 @@
 # See LICENSE for full text.
 
 import unittest
-import router
+from nersc_sdn import router
 from time import time, sleep
 from pymongo import MongoClient
 from initdb import init

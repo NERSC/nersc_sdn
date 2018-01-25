@@ -1,7 +1,8 @@
 
+from __future__ import print_function
 from pymongo import MongoClient
 import time
-import vyos_interface
+from nersc_sdn import vyos_interface
 import logging
 import requests
 import json
@@ -46,7 +47,7 @@ class Router:
         self.routes = client.sdn.routes
         while True:
             if os.path.exists("/tmp/shutdown_sdn"):
-                print "Shut down triggered"
+                print("Shut down triggered")
                 return 0
             # Look for expired jobs
             now = time.time()

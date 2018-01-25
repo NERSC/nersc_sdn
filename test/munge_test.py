@@ -18,7 +18,7 @@
 
 import os
 import unittest
-import munge
+from nersc_sdn import munge
 
 
 class MungeTestCase(unittest.TestCase):

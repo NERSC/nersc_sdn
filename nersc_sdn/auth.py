@@ -22,7 +22,7 @@ Lifted from Shifter (https://github.com/nersc/shifter)
 Module to abstract authentication.  Currently just wraps munge.
 """
 
-import munge
+import nersc_sdn.munge as munge
 
 
 class Authentication(object):

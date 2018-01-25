@@ -18,8 +18,8 @@
 
 import os
 import unittest
-import auth
-import munge
+from nersc_sdn import auth
+from nersc_sdn import munge
 
 
 class MungeTestCase(unittest.TestCase):

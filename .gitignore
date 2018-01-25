@@ -2,6 +2,7 @@
 ./test/config
 .coverage
 coverage
-./test/ssh
-./test/tbin/.munge.expired
-
+test/ssh
+test/tbin/.munge.expired
+test/tbin/.munge.replay
+test/tbin/.munge.test

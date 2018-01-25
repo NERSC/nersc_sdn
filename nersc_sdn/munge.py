@@ -21,6 +21,7 @@
 Helper routines for munge
 """
 
+from __future__ import print_function
 import sys
 from subprocess import Popen, PIPE
 DEBUG = False
@@ -84,7 +85,7 @@ def unmunge(encoded, socket=None):
         return resp
     except:
         if DEBUG:
-            print sys.exc_value
+            print(sys.exc_value)
         raise
 
 
@@ -92,7 +93,7 @@ def usage(program):
     """
     Help for test mode of munge helpers
     """
-    print "%s <munge|unmunge>" % (program)
+    print("%s <munge|unmunge>" % (program))
 
 
 def _main():
@@ -106,11 +107,11 @@ def _main():
 
     command = sys.argv.pop(0)
     if command == 'munge':
-        print munge('test')
+        print(munge('test'))
     elif command == "unmunge":
         message = sys.stdin.read().strip()
         resp = unmunge(message, socket="/var/run/munge/munge.socket.2")
-        print "Response: " + str(resp)
+        print("Response: " + str(resp))
     else:
         usage(program)
 

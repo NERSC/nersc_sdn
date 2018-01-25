@@ -15,8 +15,9 @@ class APITestCase(unittest.TestCase):
         client = MongoClient("localhost")
         self.routes = client["sdn"].routes
         self.initdb()
-        os.environ['SDN_SETTINGS'] = "./test/settings.ini"
-        import sdnapi
+        td = os.path.dirname(os.path.realpath(__file__))
+        os.environ['SDN_SETTINGS'] = "%s/settings.ini" % (td)
+        from nersc_sdn import sdnapi
         astr = "good:root:root::0:0:nid0001:10.128.0.1"
         self.allowed = {'authentication': astr}
 
@@ -45,7 +46,7 @@ class APITestCase(unittest.TestCase):
         init('localhost', '1.2.3', 4, 4)
 
     def test_testauth(self):
-        from sdnapi import is_allowed
+        from nersc_sdn.sdnapi import is_allowed
         status = is_allowed({})
         self.assertEquals(status, False)
 

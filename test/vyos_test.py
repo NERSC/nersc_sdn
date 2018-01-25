@@ -2,7 +2,7 @@
 # See LICENSE for full text.
 
 import unittest
-import vyos_interface
+from nersc_sdn import vyos_interface
 
 
 class VyosTestCase(unittest.TestCase):

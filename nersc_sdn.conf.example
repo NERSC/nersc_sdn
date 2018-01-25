@@ -1,0 +1,7 @@
+MAPFILE="/etc/nersc_sdn/mapfile"
+AUTHMODE="munge"
+POLLINTERVAL="0.1"
+DBHOST = 'mongo'
+RTRUSER = 'sdn'
+ALLOWED = [0]
+api_url = 'http://localhost:5000'

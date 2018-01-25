@@ -2,7 +2,7 @@
 
 import pprint
 from flask import Flask, jsonify, request
-import router
+import nersc_sdn.router as router
 import auth
 import os
 import json
@@ -16,10 +16,14 @@ application.config['AUTHMODE'] = 'munge'
 application.config['ALLOWED'] = [0]
 application.config['JOBSURL'] = 'http://localhost:8000'
 
+cfgfile = '/etc/nersc_sdn.conf'
 if 'SDN_SETTINGS' in os.environ:
+    cfgfile = os.environ['SDN_SETTINGS']
+
+if os.path.exists(cfgfile):
     application.logger.info("Loading settings from " +
-                            os.environ['SDN_SETTINGS'])
-    application.config.from_envvar('SDN_SETTINGS')
+                            cfgfile)
+    application.config.from_pyfile(cfgfile)
 
 application.logger.debug(application.config)
 
@@ -28,7 +32,6 @@ router = router.Router(application.config)
 auth_mode = application.config['AUTHMODE']
 auth_handler = auth.Authentication({'authentication': auth_mode})
 AUTH_HEADER = 'authentication'
-
 
 def shutdown():
     router.shutdown()
