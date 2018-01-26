@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#squeue -o %L -j 1234 -h
+if [ "x$1" == "x-o" ] ;then
+   echo "10:00"
+else
+# Other case used in job manager
+   echo "1234"
+   echo "1235"
+
+fi
+

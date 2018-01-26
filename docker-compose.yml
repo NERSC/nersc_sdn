@@ -1,0 +1,30 @@
+api:
+  image: sdntest
+  ports:
+   - 5050:5000
+  links:
+   - mongo
+  volumes:
+   - ./tconfig:/config
+   - ./test/ssh:/root/.ssh
+  environment:
+  - MOCK=1
+  - FLASK_DEBUG=1
+  - SDN_SETTINGS=/config/settings.ini
+  command: munge api
+mongo:
+  image: mongo
+  volumes:
+    - /data/db
+  command: --smallfiles
+node:
+  image: sdntest
+  links:
+   - api
+  ports:
+   - "2230:22"
+  volumes:
+  - ./tconfig/:/config
+  environment:
+  - ADDUSER=canon
+  command: munge ssh
