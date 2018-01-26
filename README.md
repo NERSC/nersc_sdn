@@ -45,6 +45,22 @@ To run a test instance of the server do the following.
     ./test/genconfig.sh
     docker-compose up -d
 
+If you haven't done so before, you will need to initialize the database.
+
+    docker-compose exec api bash
+    # /src/initdb.py mongo 10.10.10 1:5
+    # exit
+
+
 To build the test image do a docker build against Dockerfile.test.
 
     docker build -t sdntest -f Dockerfile.test .
+
+To test things, ssh to the node container and run cli.py commands.
+
+    ssh -o stricthostkeychecking=no -i ./tconfig/ssh -p 2230  root@localhost
+    cli.py
+    SLURM_JOBID=1234 cli.py associate
+    cli.py
+    cli.py release
+    cli.py

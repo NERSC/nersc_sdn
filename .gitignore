@@ -1,5 +1,6 @@
 *.pyc
-./test/config
+test/config
+tconfig
 .coverage
 coverage
 test/ssh
