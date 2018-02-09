@@ -94,6 +94,8 @@ class RouterTestCase(unittest.TestCase):
             'ip': '10.128.0.1',
             'router': 'router',
             'last_associated': '2017',
+            'user': 'auser',
+            'jobid': '1234',
             'status': 'used'
         }
         self.routes.insert(rec)
@@ -102,6 +104,11 @@ class RouterTestCase(unittest.TestCase):
 
         status = self.router.release('10.128.0.1')
         self.assertEquals(status, 'released')
+        nrec = self.routes.find_one({'address': '1.2.3.4'})
+        self.assertIsNone(nrec['user'])
+        self.assertIsNone(nrec['jobid'])
+        self.assertIsNone(nrec['router'])
+        self.assertEquals(nrec['status'], 'available')
 
     def test_timer(self):
         rec = {

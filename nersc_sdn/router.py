@@ -160,7 +160,10 @@ class Router:
         update = {
             'status': AVAILABLE,
             'ip': None,
-            'router': None
+            'router': None,
+            'end_time': None,
+            'jobid': None,
+            'user': None
         }
         self.routes.update({'ip': ip}, {'$set': update})
         return "released"
