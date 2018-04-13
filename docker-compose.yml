@@ -1,5 +1,5 @@
 api:
-  image: sdntest
+  image: scanon/sdntest
   ports:
    - 5050:5000
   links:
@@ -11,14 +11,14 @@ api:
   - MOCK=1
   - FLASK_DEBUG=1
   - SDN_SETTINGS=/config/settings.ini
-  command: munge api
+  command: munge api jobserver
 mongo:
   image: mongo
   volumes:
     - /data/db
   command: --smallfiles
 node:
-  image: sdntest
+  image: scanon/sdntest
   links:
    - api
   ports:
@@ -27,4 +27,7 @@ node:
   - ./tconfig/:/config
   environment:
   - ADDUSER=canon
+  privileged: yes
+  cap_add:
+  - SYS_PTRACE
   command: munge ssh

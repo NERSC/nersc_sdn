@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Emulate salloc
+export SLURM_JOBID=1
+if [ -e /config/nextjob ] ; then
+  SLURM_JOBID=$(cat /config/nextjob)
+fi
+
+N=$((SLURM_JOBID+1))
+echo $N > /config/nextjob
+echo ":${SLURM_JOBID}:" >> /config/jobs
+$SHELL
+
+# Remove job
+cp /config/jobs /config/jobs.prev
+cat /config/jobs.prev|grep -v ":${SLURM_JOBID}:" > /config/jobs
+

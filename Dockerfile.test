@@ -39,6 +39,7 @@ RUN cd /src/ && python ./setup.py install
 RUN \
     cp /src/test/nersc_sdn.conf.test /etc/nersc_sdn.conf && \
     cp /src/test/squeue.mock /usr/bin/squeue && \
+    cp /src/test/salloc.mock /usr/bin/salloc && \
     mkdir /root/.ssh && chmod 700 /root/.ssh && \
     echo "   StrictHostKeyChecking no" >> /etc/ssh/ssh_config && \
     chmod 755 /var/log/

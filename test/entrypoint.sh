@@ -51,6 +51,8 @@ for service in $@ ; do
     gunicorn -b 0.0.0.0:5000 nersc_sdn.sdnapi:application &
   elif  [ $(echo $service|grep -c "ssh") -gt 0 ] ; then
     /usr/sbin/sshd -D
+  elif  [ $(echo $service|grep -c "jobserver") -gt 0 ] ; then
+    /usr/sbin/job_server.py &
   else
     echo "$service not recognized"
   fi

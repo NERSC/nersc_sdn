@@ -53,7 +53,9 @@ def get_time(jobid):
 
 cv = read_config()
 
-url = cv.get('api_url', 'http://localhost:5000')
+baseurl = cv.get('api_url', 'http://localhost:5000')
+
+url = baseurl.rstrip('/') + '/v1'
 
 header = {'authentication': munge('')}
 
@@ -76,6 +78,7 @@ elif len(sys.argv) > 1 and sys.argv[1] == 'associate':
         sys.exit(1)
     jobid = os.environ['SLURM_JOBID']
     user = pwd.getpwuid(os.getuid()).pw_name
+    uid = os.getuid()
     try:
         e_time = get_time(jobid)
     except:
@@ -84,7 +87,8 @@ elif len(sys.argv) > 1 and sys.argv[1] == 'associate':
 
     d = {'end_time': e_time,
          'jobid': jobid,
-         'user': user}
+         'user': user,
+         'uid': uid}
     try:
         jdata = json.dumps(d)
         r = requests.post(url+'/associate/', headers=header, data=jdata)

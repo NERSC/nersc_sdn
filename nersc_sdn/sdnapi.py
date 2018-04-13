@@ -80,7 +80,7 @@ def ping():
     return ''
 
 
-@application.route("/associate/", methods=["POST"])
+@application.route("/v1/associate/", methods=["POST"])
 def associate():
     resp = {}
     try:
@@ -102,7 +102,7 @@ def associate():
     return jsonify(resp)
 
 
-@application.route("/associate/<ip>", methods=["POST"])
+@application.route("/v1/associate/<ip>", methods=["POST"])
 def associateip(ip):
     resp = {}
     try:
@@ -141,7 +141,7 @@ def release():
     return jsonify(resp)
 
 
-@application.route("/release/<ip>")
+@application.route("/v1/release/<ip>")
 def releaseip(ip):
     resp = {}
     try:
@@ -157,7 +157,7 @@ def releaseip(ip):
     return jsonify(resp)
 
 
-@application.route("/addresses/")
+@application.route("/v1/addresses/")
 def list_addresses():
     resp = {}
     try:
@@ -173,7 +173,7 @@ def list_addresses():
     return jsonify(resp)
 
 
-@application.route("/status/")
+@application.route("/v1/status/")
 def status():
     status = {}
     try:

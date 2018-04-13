@@ -108,7 +108,7 @@ class Router:
         return resp
 
     def check_data(self, data):
-        required = ['user', 'end_time', 'jobid']
+        required = ['uid', 'end_time', 'jobid']
         for f in required:
             if f not in data:
                 raise ValueError('Missing %s' % (f))
@@ -129,12 +129,15 @@ class Router:
             logging.warn("No available addresses found")
             return None
         address = rec['address']
+        if 'user' not in data:
+            data['user'] = 'unknown'
         update = {
             'status': ASSIGNING,
             'ip': ip,
             'router': router,
             'end_time': data['end_time'],
             'user': data['user'],
+            'uid': data['uid'],
             'jobid': data['jobid'],
             'last_associated': time.time()
         }
@@ -163,7 +166,8 @@ class Router:
             'router': None,
             'end_time': None,
             'jobid': None,
-            'user': None
+            'user': None,
+            'uid': None
         }
         self.routes.update({'ip': ip}, {'$set': update})
         return "released"
