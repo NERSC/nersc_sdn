@@ -125,7 +125,7 @@ def associateip(ip):
     return jsonify(resp)
 
 
-@application.route("/release/")
+@application.route("/v1/release/")
 def release():
     resp = {}
     try:
