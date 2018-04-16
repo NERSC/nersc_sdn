@@ -39,8 +39,9 @@ NERSC's SDN API service to dynamically create routes to HPC compute nodes
 Summary: NERSC's SDN API Job Server
 
 %description jobserver
-NERSC's SDN API job service to provide a list of running jobs to the SDN API
-service.
+This provides a simple daemon that returns a list of running jobs.  It is
+used by the API service to cleanup after jobs have finished.
+
 
 %prep
 %setup -n %{name}-%{unmangled_version}
@@ -50,19 +51,21 @@ python setup.py build
 
 %install
 python setup.py install -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system/
+%{__install} -m 0644 sdn_job_server.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-/usr/lib/python2.6/site-packages/nersc_sdn
-/usr/lib/python2.6/site-packages/nersc_sdn-0.1-py2.6.egg-info
-/etc/nersc_sdn.conf.example
+/usr/lib/python2.7/site-packages/nersc_sdn
+/usr/lib/python2.7/site-packages/nersc_sdn-0.1-py2.7.egg-info
+%config(noreplace missingok) /etc/nersc_sdn.conf.example
 
 %files cli
 %defattr(-,root,root)
-/usr/bin/cli.py
+/usr/bin/sdn_cli
 
 %files server
 %defattr(-,root,root)
@@ -70,7 +73,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files jobserver
 %defattr(-,root,root)
-/usr/sbin/job_server.py
+/usr/sbin/sdn_job_server
+/usr/lib/systemd/system/sdn_job_server.service
 
 %post server
 pip install -y pexpect flask
+
+%changelog
+* Fri Apr 13 2018 Shane Canon <scanon@lbl.gov> - 0.1
+- Initial release
+

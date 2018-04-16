@@ -1,0 +1,16 @@
+[Unit]
+Description=NERSC SDN Job Server
+After=munge.service
+
+[Service]
+Type=simple
+User=nobody
+Group=nobody
+PrivateTmp=true
+PermissionsStartOnly=true
+ExecStart=/usr/sbin/sdn_job_server
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

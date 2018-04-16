@@ -9,13 +9,22 @@ from __future__ import print_function
 
 from distutils.core import setup
 
+import shutil
+import os
+
+if not os.path.exists('scripts'):
+    os.makedirs('scripts')
+shutil.copyfile('job_server.py', 'scripts/sdn_job_server')
+shutil.copyfile('cli.py', 'scripts/sdn_cli')
+
+
 setup_args = dict(
     name='nersc_sdn',
     version='0.1',
     packages=['nersc_sdn'],
-    scripts=['cli.py','initdb.py'],
+    scripts=['scripts/sdn_cli', 'initdb.py'],
     data_files=[('/etc', [ 'nersc_sdn.conf.example' ]),
-                ('/usr/sbin', ['job_server.py'])],
+                ('/usr/sbin', ['scripts/sdn_job_server'])],
     description="""NERSC's SDN API service to dynamically create routes to HPC compute nodes""",
     long_description="""NERSC's SDN API service to dynamically create routes to HPC compute nodes""",
     author="Shane Canon",
