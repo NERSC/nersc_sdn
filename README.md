@@ -48,7 +48,7 @@ To run a test instance of the server do the following.
 If you haven't done so before, you will need to initialize the database.
 
     docker-compose exec api bash
-    # /src/initdb.py mongo 10.10.10 1:5
+    # /src/sdninitdb.py mongo 10.10.10 1:5
     # exit
 
 

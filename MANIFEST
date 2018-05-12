@@ -1,5 +1,5 @@
 cli.py
-initdb.py
+sdninitdb.py
 setup.py
 job_server.py
 nersc_sdn.conf.example

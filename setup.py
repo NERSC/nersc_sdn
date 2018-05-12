@@ -20,9 +20,9 @@ shutil.copyfile('cli.py', 'scripts/sdn_cli')
 
 setup_args = dict(
     name='nersc_sdn',
-    version='0.1',
+    version='0.2',
     packages=['nersc_sdn'],
-    scripts=['scripts/sdn_cli', 'initdb.py'],
+    scripts=['scripts/sdn_cli', 'sdninitdb.py'],
     data_files=[('/etc', [ 'nersc_sdn.conf.example' ]),
                 ('/usr/sbin', ['scripts/sdn_job_server'])],
     description="""NERSC's SDN API service to dynamically create routes to HPC compute nodes""",

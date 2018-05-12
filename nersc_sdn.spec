@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.1
-%define unmangled_version 0.1
+%define version 0.2
+%define unmangled_version 0.2
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -69,7 +69,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files server
 %defattr(-,root,root)
-/usr/bin/initdb.py
+/usr/bin/sdninitdb.py
 
 %files jobserver
 %defattr(-,root,root)
@@ -80,6 +80,9 @@ rm -rf $RPM_BUILD_ROOT
 pip install -y pexpect flask
 
 %changelog
+* Sat May 12 2018 Shane Canon <scanon@lbl.gov> - 0.2
+- Bug Fixes and renamed initdb
+
 * Fri Apr 13 2018 Shane Canon <scanon@lbl.gov> - 0.1
 - Initial release
 

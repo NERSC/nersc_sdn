@@ -138,7 +138,7 @@ class Router:
             'end_time': data['end_time'],
             'user': data['user'],
             'uid': data['uid'],
-            'jobid': data['jobid'],
+            'jobid': str(data['jobid']),
             'last_associated': time.time()
         }
         self.routes.update({'address': address}, {'$set': update})
