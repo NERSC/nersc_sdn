@@ -3,6 +3,7 @@ from __future__ import print_function
 from pymongo import MongoClient
 import time
 from nersc_sdn import vyos_interface
+from nersc_sdn.ddns import DDNS
 import logging
 import requests
 import json
@@ -25,6 +26,7 @@ class Router:
         mapfile = settings['MAPFILE']
         self.map = self._load_mapfile(mapfile)
         self.vyos = vyos_interface.vyosInterface(user)
+        self.ddns = self._init_dns(settings)
         self.cleanup_proc = Process(target=self.cleanup,
                                     name='CleanupThread')
         self.cleanup_proc.start()
@@ -36,6 +38,25 @@ class Router:
         if self.routes.find_one() is None:
             self.cleanup_proc.terminate()
             raise OSError('DB not initialized')
+
+    def _init_dns(self, settings):
+        has_ddns_param = False
+        dnsparams = ['DNS_BASE', 'DNS_ZONE', 'DNS_SERVER', 'DNS_KEYFILE',
+                     'DNS_PREFIX']
+        for p in dnsparams:
+            if p in settings:
+                has_ddns_param = True
+        if has_ddns_param:
+            # Now make sure all are provided
+            for param in dnsparams:
+                if param not in settings:
+                    raise ValueError("Missing %s parameter" % (param))
+            return DDNS(base=settings['DNS_BASE'],
+                        prefix=settings['DNS_PREFIX'],
+                        keyfile=settings['DNS_KEYFILE'],
+                        server=settings['DNS_SERVER'],
+                        zone=settings['DNS_ZONE'])
+        return None
 
     def shutdown(self):
         self.cleanup_proc.terminate()
@@ -148,6 +169,8 @@ class Router:
             'last_associated': time.time()
         }
         self.routes.update({'address': address}, {'$set': update})
+        if self.ddns is not None:
+            self.ddns.add_dns(str(data['jobid']), ip)
         return address
 
     def release(self, ip):
@@ -170,4 +193,6 @@ class Router:
             'uid': None
         }
         self.routes.update({'ip': ip}, {'$set': update})
+        if self.ddns is not None:
+            self.ddns.del_dns(rec['jobid'])
         return "released"

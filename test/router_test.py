@@ -5,7 +5,7 @@ import unittest
 from nersc_sdn import router
 from time import time, sleep
 from pymongo import MongoClient
-from initdb import init
+from sdninitdb import init
 from job_server import server
 import os
 
@@ -18,7 +18,12 @@ class RouterTestCase(unittest.TestCase):
             'RTRUSER': 'sdn',
             'MAPFILE': 'test/mapfile',
             'JOBSURL': 'http://localhost:8000',
-            'POLLINTERVAL': '0.1'
+            'POLLINTERVAL': '0.1',
+            'DNS_BASE': 'jobs.domain.org',
+            'DNS_PREFIX': 'job',
+            'DNS_ZONE': 'domain.org',
+            'DNS_SERVER': 'ns.domain.org',
+            'DNS_KEYFILE': './kf'
         }
         client = MongoClient("localhost")
         self.routes = client["sdn"].routes
@@ -26,6 +31,7 @@ class RouterTestCase(unittest.TestCase):
         self.router = router.Router(self.settings)
         self.jobfile = '/tmp/sqjobs'
         self.data = {'user': 'auser',
+                     'uid': 501,
                      'end_time': time()+60,
                      'jobid': '1234'}
 
@@ -94,6 +100,7 @@ class RouterTestCase(unittest.TestCase):
             'ip': '10.128.0.1',
             'router': 'router',
             'last_associated': '2017',
+            'uid': 501,
             'user': 'auser',
             'jobid': '1234',
             'status': 'used'
@@ -117,6 +124,7 @@ class RouterTestCase(unittest.TestCase):
             'router': 'router',
             'last_associated': time(),
             'end_time': time()+2,
+            'uid': 501,
             'user': 'auser',
             'jobid': '1234',
             'status': 'used'
@@ -127,6 +135,7 @@ class RouterTestCase(unittest.TestCase):
             'router': 'router',
             'last_associated': time(),
             'end_time': time()+10000,
+            'uid': 502,
             'user': 'buser',
             'jobid': '1235',
             'status': 'used'
@@ -152,6 +161,7 @@ class RouterTestCase(unittest.TestCase):
             'router': 'router',
             'last_associated': time(),
             'end_time': time()+10,
+            'uid': 501,
             'user': 'auser',
             'jobid': '1233',
             'status': 'used'

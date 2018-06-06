@@ -6,7 +6,7 @@ import os
 import json
 from time import time
 from pymongo import MongoClient
-from initdb import init
+from sdninitdb import init
 
 
 class APITestCase(unittest.TestCase):
@@ -33,7 +33,7 @@ class APITestCase(unittest.TestCase):
         self.app = sdnapi.application.test_client()
         self.sdnapi = sdnapi
 
-        self.data = {'user': 'auser',
+        self.data = {'uid': 501, 'user': 'auser',
                      'end_time': time()+60,
                      'jobid': '1234'
                      }
@@ -62,13 +62,13 @@ class APITestCase(unittest.TestCase):
         """
         Test address call
         """
-        rv = self.app.get('/addresses/', headers=self.allowed)
+        rv = self.app.get('/v1/addresses/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/addresses/', headers=self.badauth)
+        rv = self.app.get('/v1/addresses/', headers=self.badauth)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.get('/addresses/', headers=self.unallowed)
+        rv = self.app.get('/v1/addresses/', headers=self.unallowed)
         self.assertEquals(rv.status_code, 401)
 
     def test_status(self):
@@ -76,13 +76,13 @@ class APITestCase(unittest.TestCase):
         Test status call
         """
 
-        rv = self.app.get('/status/', headers=self.allowed)
+        rv = self.app.get('/v1/status/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/status/', headers=self.badauth)
+        rv = self.app.get('/v1/status/', headers=self.badauth)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.get('/status/', headers=self.unallowed)
+        rv = self.app.get('/v1/status/', headers=self.unallowed)
         self.assertEquals(rv.status_code, 401)
 
     def test_associate(self):
@@ -94,29 +94,29 @@ class APITestCase(unittest.TestCase):
         good = self.allowed
         bad = self.badauth
         unallowed = self.unallowed
-        rv = self.app.post('/associate/', headers=good, data=d)
+        rv = self.app.post('/v1/associate/', headers=good, data=d)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.post('/associate/', headers=self.bogusip, data=d)
+        rv = self.app.post('/v1/associate/', headers=self.bogusip, data=d)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.post('/associate/10.128.0.1', headers=good, data=d)
+        rv = self.app.post('/v1/associate/10.128.0.1', headers=good, data=d)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.post('/associate/10.128.1.1', data=d)
+        rv = self.app.post('/v1/associate/10.128.1.1', data=d)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.post('/associate/10.128.0.1', headers=good)
+        rv = self.app.post('/v1/associate/10.128.0.1', headers=good)
         self.assertEquals(rv.status_code, 404)
 
         self.initdb()
-        rv = self.app.post('/associate/10.128.0.1', headers=bad, data=d)
+        rv = self.app.post('/v1/associate/10.128.0.1', headers=bad, data=d)
         self.assertEquals(rv.status_code, 404)
 
-        rv = self.app.post('/associate/', headers=unallowed, data=d)
+        rv = self.app.post('/v1/associate/', headers=unallowed, data=d)
         self.assertEquals(rv.status_code, 401)
 
-        rv = self.app.post('/associate/10.128.0.1', headers=unallowed, data=d)
+        rv = self.app.post('/v1/associate/10.128.0.1', headers=unallowed, data=d)
         self.assertEquals(rv.status_code, 401)
 
     def test_release(self):
@@ -126,25 +126,26 @@ class APITestCase(unittest.TestCase):
             'ip': '10.128.0.1',
             'router': 'router',
             'last_associated': '2017',
-            'status': 'used'
+            'status': 'used',
+            'jobid': '1234'
         }
         self.routes.insert(rec)
-        rv = self.app.get('/release/', headers=self.allowed)
+        rv = self.app.get('/v1/release/', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/10.128.0.1', headers=self.allowed)
+        rv = self.app.get('/v1/release/10.128.0.1', headers=self.allowed)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/', headers=self.bogusip)
+        rv = self.app.get('/v1/release/', headers=self.bogusip)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/10.128.0.1', headers=self.bogusip)
+        rv = self.app.get('/v1/release/10.128.0.1', headers=self.bogusip)
         self.assertEquals(rv.status_code, 200)
 
-        rv = self.app.get('/release/', headers=self.unallowed)
+        rv = self.app.get('/v1/release/', headers=self.unallowed)
         self.assertEquals(rv.status_code, 401)
 
-        rv = self.app.get('/release/10.128.0.1', headers=self.unallowed)
+        rv = self.app.get('/v1/release/10.128.0.1', headers=self.unallowed)
         self.assertEquals(rv.status_code, 401)
 
 
