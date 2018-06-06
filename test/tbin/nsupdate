@@ -1,4 +1,13 @@
 #!/bin/sh
 
 # Mock
-cat
+IN=$(cat)
+if [ $(echo $IN|grep -c add) -gt 0 ] ; then
+  IP=$(echo $IN|awk '{print $10}')
+  NAME=$(echo $IN|awk '{print $7}')
+  echo "$IP $NAME" >> hostfile
+elif [ $(echo $IN|grep -c del) -gt 0 ] ; then
+  NAME=$(echo $IN|awk '{print $7}')
+  NEW=$(cat hostfile|grep -v $NAME)
+  echo $NEW  > hostfile
+fi

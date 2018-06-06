@@ -116,7 +116,8 @@ class APITestCase(unittest.TestCase):
         rv = self.app.post('/v1/associate/', headers=unallowed, data=d)
         self.assertEquals(rv.status_code, 401)
 
-        rv = self.app.post('/v1/associate/10.128.0.1', headers=unallowed, data=d)
+        rv = self.app.post('/v1/associate/10.128.0.1', headers=unallowed,
+                           data=d)
         self.assertEquals(rv.status_code, 401)
 
     def test_release(self):

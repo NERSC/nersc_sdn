@@ -23,10 +23,12 @@ setup_args = dict(
     version='0.2',
     packages=['nersc_sdn'],
     scripts=['scripts/sdn_cli', 'sdninitdb.py'],
-    data_files=[('/etc', [ 'nersc_sdn.conf.example' ]),
+    data_files=[('/etc', ['nersc_sdn.conf.example']),
                 ('/usr/sbin', ['scripts/sdn_job_server'])],
-    description="""NERSC's SDN API service to dynamically create routes to HPC compute nodes""",
-    long_description="""NERSC's SDN API service to dynamically create routes to HPC compute nodes""",
+    description="""NERSC's SDN API service to dynamically create
+                   routes to HPC compute nodes""",
+    long_description="""NERSC's SDN API service to dynamically create routes
+                        to HPC compute nodes""",
     author="Shane Canon",
     author_email="scanon@lbl.gov",
     url="http://www.nersc.gov",
@@ -43,8 +45,10 @@ setup_args = dict(
     ],
 )
 
+
 def main():
     setup(**setup_args)
+
 
 if __name__ == '__main__':
     main()

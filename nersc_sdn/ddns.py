@@ -1,7 +1,6 @@
 from __future__ import print_function
-from multiprocessing.process import Process
-import os
 from subprocess import Popen, PIPE
+
 
 class DDNS:
     def __init__(self, keyfile='keyfile', base=None, server=None, zone=None,

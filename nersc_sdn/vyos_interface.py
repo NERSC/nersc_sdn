@@ -4,6 +4,7 @@ import pexpect
 import os
 import logging
 
+
 class vyosInterface:
     def __init__(self, user):
         logging.debug("Initializing VYOS Interface")
@@ -30,7 +31,7 @@ class vyosInterface:
         vif = self.vif
         ("Adding NAT")
         logging.debug("router=%s address=%s rule=%d int_add=%s" %
-              (router, address, rule, int_add))
+                      (router, address, rule, int_add))
         p = pexpect.spawn('ssh %s@%s' % (self.user, router))
         p.expect(self.prompt)
         self._sendline(p, "configure")

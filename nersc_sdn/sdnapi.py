@@ -33,6 +33,7 @@ auth_mode = application.config['AUTHMODE']
 auth_handler = auth.Authentication({'authentication': auth_mode})
 AUTH_HEADER = 'authentication'
 
+
 def shutdown():
     router.shutdown()
 

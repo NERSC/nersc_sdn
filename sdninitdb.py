@@ -11,7 +11,6 @@ def init(db, base, imin, imax):
     routes.remove({})
     for ip in range(imin, imax+1):
         address = '%s.%d' % (base, ip)
-        #print "Adding %s" % (address)
         rec = {
             'address': address,
             'ip': None,

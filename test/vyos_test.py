@@ -24,5 +24,6 @@ class VyosTestCase(unittest.TestCase):
     def test_remove_nat(self):
         self.vyos.remove_nat("router", "1.2.3.4")
 
+
 if __name__ == '__main__':
     unittest.main()

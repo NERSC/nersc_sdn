@@ -24,7 +24,8 @@ from nersc_sdn import munge
 class MungeTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.test_dir = os.path.dirname(os.path.abspath(__file__)) + "/../test/"
+        self.test_dir = os.path.dirname(os.path.abspath(__file__)) + \
+                        "/../test/"
         self.encoded = "xxxx\n"
         self.message = "test"
         self.expired = "expired"
