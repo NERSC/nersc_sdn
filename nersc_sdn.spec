@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.2
-%define unmangled_version 0.2
+%define version 0.3
+%define unmangled_version 0.3
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -30,7 +30,8 @@ Requires: nersc_sdn
 
 %package server
 Summary: NERSC's SDN API Server
-Requires: python-gunicorn, python-pymongo, python-pip, nersc_sdn
+Requires: python-gunicorn, python-pymongo, python-pip, nersc_sdn, python-flask
+
 
 %description server
 NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -77,9 +78,12 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/systemd/system/sdn_job_server.service
 
 %post server
-pip install -y pexpect flask
+pip install -y pexpect
 
 %changelog
+* Sat Jun 09 2018 Shane Canon <scanon@lbl.gov> - 0.3
+- Added ddns support
+
 * Sat May 12 2018 Shane Canon <scanon@lbl.gov> - 0.2
 - Bug Fixes and renamed initdb
 
