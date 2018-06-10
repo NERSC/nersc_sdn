@@ -61,7 +61,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 /usr/lib/python2.7/site-packages/nersc_sdn
-/usr/lib/python2.7/site-packages/nersc_sdn-%{vesion}-py2.7.egg-info
+/usr/lib/python2.7/site-packages/nersc_sdn-%{version}-py2.7.egg-info
 %config(noreplace missingok) /etc/nersc_sdn.conf.example
 
 %files cli
