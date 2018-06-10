@@ -170,7 +170,7 @@ class Router:
         }
         self.routes.update({'address': address}, {'$set': update})
         if self.ddns is not None:
-            self.ddns.add_dns(str(data['jobid']), ip)
+            self.ddns.add_dns(str(data['jobid']), address)
         return address
 
     def release(self, ip):
