@@ -30,7 +30,11 @@ Requires: nersc_sdn
 
 %package server
 Summary: NERSC's SDN API Server
+%if 0%{?suse_version} > 0
+Requires: python-gunicorn, python-pymongo, python-pexpect, nersc_sdn, python-flask
+%else
 Requires: python-gunicorn, python-pymongo, python-pip, nersc_sdn, python-flask
+%endif
 
 
 %description server
@@ -78,7 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/lib/systemd/system/sdn_job_server.service
 
 %post server
+%if 0%{?suse_version} < 1
 pip install -y pexpect
+%endif
 
 %changelog
 * Sat Jun 09 2018 Shane Canon <scanon@lbl.gov> - 0.3
