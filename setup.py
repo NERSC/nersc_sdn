@@ -20,7 +20,7 @@ shutil.copyfile('cli.py', 'scripts/sdn_cli')
 
 setup_args = dict(
     name='nersc_sdn',
-    version='0.3',
+    version='0.3.1',
     packages=['nersc_sdn'],
     scripts=['scripts/sdn_cli', 'sdninitdb.py'],
     data_files=[('/etc', ['nersc_sdn.conf.example']),

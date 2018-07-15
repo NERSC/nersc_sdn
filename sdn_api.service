@@ -1,0 +1,23 @@
+
+[Unit]
+Description=NERSC SDN API Server
+After=munge.service
+
+[Service]
+Type=simple
+User=sdnapi
+Group=sdnapi
+PrivateTmp=true
+PermissionsStartOnly=true
+ExecStart=/usr/bin/gunicorn \
+    -b 0.0.0.0:5000 -t 60 \
+    --access-logfile=/var/log/sdnapi/access.log \
+    --log-file=/var/log/sdnapi/error.log \
+    nersc_sdn.sdnapi:application
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
+

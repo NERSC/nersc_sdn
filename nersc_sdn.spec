@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.3
-%define unmangled_version 0.3
+%define version 0.3.1
+%define unmangled_version 0.3.1
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -57,7 +57,12 @@ python setup.py build
 %install
 python setup.py install -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system/
-%{__install} -m 0644 sdn_job_server.service $RPM_BUILD_ROOT/usr/lib/systemd/system/
+%{__install} -m 0644 sdn_job_server.service %{buildroot}%{_unitdir}/sdn_job_server.service
+%{__install} -m 0644 sdn_api.service %{buildroot}%{_unitdir}/sdn_api.service
+mkdir -p $RPM_BUILD_ROOT/var/log/sdnapi/
+
+
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -75,11 +80,18 @@ rm -rf $RPM_BUILD_ROOT
 %files server
 %defattr(-,root,root)
 /usr/bin/sdninitdb.py
+%{_unitdir}/sdn_api.service
+%dir %attr(700,sdnapi,sdnapi) /var/log/sdnapi
 
 %files jobserver
 %defattr(-,root,root)
 /usr/sbin/sdn_job_server
 /usr/lib/systemd/system/sdn_job_server.service
+
+%pre server
+/usr/sbin/groupadd -r sdnapi >/dev/null 2>&1 || :
+/usr/sbin/useradd -M -N -g sdnapi -r -d /var/lib/sdnapi -s /bin/bash \
+    -c "SDNAPI Server" sdnapi >/dev/null 2>&1 || :
 
 %post server
 %if 0%{?suse_version} < 1
@@ -87,6 +99,9 @@ pip install -y pexpect
 %endif
 
 %changelog
+* Sat Jul 15 2018 Shane Canon <scanon@lbl.gov> - 0.3.1
+- Added service files
+
 * Sat Jun 09 2018 Shane Canon <scanon@lbl.gov> - 0.3
 - Added ddns support
 
