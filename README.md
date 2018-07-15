@@ -5,38 +5,48 @@ This service provides a simple REST interface that can be used to instantiate an
 ## REST API
 
 ### Associate
-HEADER: “authentication: <munge>”
-POST /associate/
+HEADER: “authentication: \<munge\>” \
+POST /associate/ \
 DATA (JSON Encoded)
-```{
+
+```javacript
+{
   "end_time": <int: end time in epoch form>,
   “jobid": "<string: SLURM JOB ID>",
   "user": "<string: user name>"
-}```
+}
+```
 
 RETURNS: JSON encoded hash with address.
+
 ```javascript
 {
   "address": "128.55.224.13"
-}```
+}
+```
 
 ### Associate for a specific node
-HEADER: “authentication: <munge>”
-POST /associate/<ip>
+HEADER: “authentication: \<munge\>” \
+POST /associate/\<ip\> \
 DATA (JSON Encoded)
-```{
+
+```javascript
+{
   "end_time": <int: end time in epoch form>,
   “jobid": "<string: SLURM JOB ID>",
   "user": "<string: user name>"
-}```
+}
+```
 
 Note: IP is the internal IP address to be mapped.
 
 RETURNS: JSON encoded hash with address.
+
 ```javascript
 {
   "address": "128.55.224.13"
-}```
+}
+```
 
 ## Testing setUp
 
