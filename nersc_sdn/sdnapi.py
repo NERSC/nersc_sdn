@@ -185,7 +185,7 @@ def status():
         status = router.status()
     except:
         return not_found()
-    return jsonify({'data': resp})
+    return jsonify({'data': status})
 
 
 if __name__ == "__main__":
