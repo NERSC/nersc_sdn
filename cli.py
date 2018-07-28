@@ -68,6 +68,9 @@ if len(sys.argv) == 1 or sys.argv[1] == 'status':
         sys.exit(1)
     print("Ext IP          Int. IP         Status     Router")
     print("=======================================================")
+    # Backward compatibility
+    if 'data' in data:
+        data = data['data']
     for r in data:
         print('%-15s %-15s %-10s %-10s' % (r['address'], r['ip'],
                                            r['status'], r['router']))

@@ -171,7 +171,7 @@ def list_addresses():
         return not_found()
 
     resp['available'] = addrs
-    return jsonify(resp)
+    return jsonify({'data': resp})
 
 
 @application.route("/v1/status/")
