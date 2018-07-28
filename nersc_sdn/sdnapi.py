@@ -171,7 +171,7 @@ def list_addresses():
         return not_found()
 
     resp['available'] = addrs
-    return jsonify({'data': resp})
+    return jsonify(resp)
 
 
 @application.route("/v1/status/")
@@ -185,7 +185,7 @@ def status():
         status = router.status()
     except:
         return not_found()
-    return jsonify(status)
+    return jsonify({'data': resp})
 
 
 if __name__ == "__main__":
