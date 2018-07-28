@@ -79,7 +79,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files server
 %defattr(-,root,root)
-/usr/bin/sdninitdb.py
+%{_libexecdir}/nersc_sdn/sdninitdb
 %{_unitdir}/sdn_api.service
 %dir %attr(700,sdnapi,sdnapi) /var/log/sdnapi
 
@@ -99,7 +99,7 @@ pip install -y pexpect
 %endif
 
 %changelog
-* Sat Jul 15 2018 Shane Canon <scanon@lbl.gov> - 0.3.1
+* Sun Jul 15 2018 Shane Canon <scanon@lbl.gov> - 0.3.1
 - Added service files
 
 * Sat Jun 09 2018 Shane Canon <scanon@lbl.gov> - 0.3

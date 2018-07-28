@@ -11,19 +11,28 @@ from distutils.core import setup
 
 import shutil
 import os
+from subprocess import check_output
 
 if not os.path.exists('scripts'):
     os.makedirs('scripts')
 shutil.copyfile('job_server.py', 'scripts/sdn_job_server')
 shutil.copyfile('cli.py', 'scripts/sdn_cli')
+shutil.copyfile('sdninitdb.py', 'scripts/sdninitdb')
+libexec = '/usr/libexec'
 
+try:
+    libexec =  check_output(['rpm','--eval','%{_libexecdir}']).rstrip()
+except:
+    pass
+print(libexec)
 
 setup_args = dict(
     name='nersc_sdn',
     version='0.3.1',
     packages=['nersc_sdn'],
-    scripts=['scripts/sdn_cli', 'sdninitdb.py'],
+    scripts=['scripts/sdn_cli'],
     data_files=[('/etc', ['nersc_sdn.conf.example']),
+		(libexec + '/nersc_sdn', ['scripts/sdninitdb']),
                 ('/usr/sbin', ['scripts/sdn_job_server'])],
     description="NERSC's SDN API service to dynamically create " +
                 "routes to HPC compute nodes",
