@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.3.1
-%define unmangled_version 0.3.1
+%define version 0.3.2
+%define unmangled_version 0.3.2
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -99,6 +99,9 @@ pip install -y pexpect
 %endif
 
 %changelog
+* Mon Oct 01 2018 Shane Canon <scanon@lbl.gov> - 0.3.2
+- Added key file option for ssh
+
 * Sun Jul 15 2018 Shane Canon <scanon@lbl.gov> - 0.3.1
 - Added service files
 
