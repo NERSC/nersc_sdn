@@ -1,9 +1,13 @@
 #!/bin/sh
 
-rm ssh.out
+[ -e ssh.out ] && rm ssh.out
 while true ; do
   read -p "sdn@blah: " line
-  echo $line >> ssh.out 
+  if [ "$1" == "-i" ] ; then
+    echo "yep $line" >> ssh.out
+  else
+    echo $line >> ssh.out 
+  fi
   #if [ $(echo $line|grep -c exit) -gt 0 ] ; then
   #  exit
   #fi

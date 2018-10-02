@@ -6,12 +6,13 @@ import logging
 
 
 class vyosInterface:
-    def __init__(self, user):
+    def __init__(self, user, key=None):
         logging.debug("Initializing VYOS Interface")
         self.user = user
         self.prompt = self.user+"@.*$"
         self.interface = "bond1"
         self.vif = 224
+        self.key = key
 
     def _get_rule(self, address):
         last = int(address.split('.')[3])
@@ -20,6 +21,13 @@ class vyosInterface:
     def _sendline(self, child, line):
         child.sendline(line)
         child.expect(self.prompt)
+
+    def _spawn(self, router):
+        key = ''
+        if self.key is not None:
+            key = '-i %s ' % (self.key)
+
+        return pexpect.spawn('ssh %s%s@%s' % (key, self.user, router))
 
     def add_nat(self, int_add, router, address):
         # Mock stubs
@@ -32,7 +40,7 @@ class vyosInterface:
         ("Adding NAT")
         logging.debug("router=%s address=%s rule=%d int_add=%s" %
                       (router, address, rule, int_add))
-        p = pexpect.spawn('ssh %s@%s' % (self.user, router))
+        p = self._spawn(router)
         p.expect(self.prompt)
         self._sendline(p, "configure")
         # Add interface
@@ -69,7 +77,7 @@ class vyosInterface:
         vif = self.vif
         logging.debug("Remove NAT")
         logging.debug("router=%s address=%s rule=%d" % (router, address, rule))
-        p = pexpect.spawn('ssh %s@%s' % (self.user, router))
+        p = self._spawn(router)
         p.expect(self.prompt)
         self._sendline(p, "configure")
         self._sendline(p, "delete interfaces bonding %s vif %d address '%s/24'"

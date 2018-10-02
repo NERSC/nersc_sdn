@@ -24,8 +24,11 @@ class Router:
         self.agent = settings['JOBSURL']
         user = settings['RTRUSER']
         mapfile = settings['MAPFILE']
+        key = None
+        if 'RTRKEY' in settings:
+            key = settings['RTRKEY']
         self.map = self._load_mapfile(mapfile)
-        self.vyos = vyos_interface.vyosInterface(user)
+        self.vyos = vyos_interface.vyosInterface(user, key=key)
         self.ddns = self._init_dns(settings)
         self.cleanup_proc = Process(target=self.cleanup,
                                     name='CleanupThread')
@@ -83,7 +86,6 @@ class Router:
                 self.check_jobs(running)
             except:
                 pass
-
             time.sleep(self.poll)
 
     def check_jobs(self, running):

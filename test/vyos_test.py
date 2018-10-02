@@ -24,6 +24,15 @@ class VyosTestCase(unittest.TestCase):
     def test_remove_nat(self):
         self.vyos.remove_nat("router", "1.2.3.4")
 
+    def test_key(self):
+        """
+        Make sure key gets passed through (ssh tester will say yep)
+        """
+        vyos = vyos_interface.vyosInterface("sdn", key='/etc/hosts')
+        self.assertEqual(vyos.key, '/etc/hosts')
+        vyos.add_nat("172.17.0.17", "router", "1.2.3.4")
+        self.assertIn('yep', self.read_output())
+
 
 if __name__ == '__main__':
     unittest.main()
