@@ -85,7 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files jobserver
 %defattr(-,root,root)
-/usr/sbin/sdn_job_server
+%attr(755,root,root) /usr/sbin/sdn_job_server
 /usr/lib/systemd/system/sdn_job_server.service
 
 %pre server
