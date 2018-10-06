@@ -1,0 +1,6 @@
+[run]
+omit =
+    test/*
+    setup.py
+    cli.py
+    sdninitdb.py

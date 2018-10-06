@@ -20,7 +20,7 @@ import unittest
 import requests
 import job_server
 import SocketServer
-
+from time import sleep
 
 class ServerTestCase(unittest.TestCase):
 
@@ -34,6 +34,7 @@ class ServerTestCase(unittest.TestCase):
 
     def test_server(self):
         s = job_server.server()
+        sleep(1)
         r = requests.get('http://localhost:8000')
         self.assertEquals(r.status_code, 200)
         s.terminate()

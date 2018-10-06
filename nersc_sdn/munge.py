@@ -96,7 +96,7 @@ def usage(program):
     print("%s <munge|unmunge>" % (program))
 
 
-def _main():
+def _main():  # pragma: no cover
     """
     Brief test/validation code for munge helpers
     """
@@ -116,5 +116,5 @@ def _main():
         usage(program)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':   # pragma: no cover
     _main()

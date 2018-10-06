@@ -28,7 +28,7 @@ print(libexec)
 
 setup_args = dict(
     name='nersc_sdn',
-    version='0.3.2',
+    version='0.3.3',
     packages=['nersc_sdn'],
     scripts=['scripts/sdn_cli'],
     data_files=[('/etc', ['nersc_sdn.conf.example']),
