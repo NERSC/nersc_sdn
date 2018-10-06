@@ -38,3 +38,15 @@ class DDNSTestCase(unittest.TestCase):
         with open(self.hf) as f:
             line = f.read().rstrip()
         self.assertEquals(line, '')
+
+    def test_init(self):
+        with self.assertRaises(ValueError):
+            self.ddns = DDNS(keyfile='./kf',
+                             server='ns.my.org',
+                             zone='my.org')
+        with self.assertRaises(ValueError):
+            self.ddns = DDNS(base='base',
+                             server='ns.my.org')
+        d = self.ddns = DDNS(base='base',
+                             zone='my.org')
+        self.assertEquals('ns.base', d.server)

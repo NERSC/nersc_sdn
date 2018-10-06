@@ -48,6 +48,31 @@ RETURNS: JSON encoded hash with address.
 }
 ```
 
+## Configuration
+
+Configuration is controlled by the nersc_sdn.conf file.  It supports the
+following settings.
+
+* DBHOST: hostname of the mongo host.
+* RTRUSER: Username to use for the ssh connection to the router.
+* MAPFILE: Path to the map file.
+* AUTHMODE: Authentication mode.  Only munge is supported.
+* ALLOWED: List of users by uid that are allowed to make requests.
+* JOBSURL: URL of the job server.
+* POLLINTERVAL: Frequency to check for completed jobs.
+
+Dynamic DNS
+
+In addition the following settings are aviable to configure dynamic DNS
+* DNS_BASE: Base part of the name
+* DNS_ZONE: Parameter for the zone transfer
+* DNS_SERVER: Server to use for the name request
+* DNS_KEYFILE: Path to the keyfile for the request
+* DNS_PREFIX: Prefix for the name.
+
+The name assoicated with the IP during a job has the format of [_prefix_]*[Job Number]*.[_base_].  For example if DNS_BASE is 'gerty.services.nersc.gov' and DNS_PREFIX is 'job' for job 123, then name would be 'job123.gerty.services.nersc.gov'.
+
+
 ## Testing setUp
 
 To run a test instance of the server do the following.
