@@ -7,6 +7,7 @@ from nersc_sdn.ddns import DDNS
 import logging
 import requests
 import json
+from subprocess import Popen, PIPE, STDOUT
 from multiprocessing.process import Process
 import os
 
@@ -27,14 +28,13 @@ class Router:
         self.map = self._load_mapfile(mapfile)
         self.vyos = vyos_interface.vyosInterface(user)
         self.ddns = self._init_dns(settings)
+        self.shutdown_file = settings.get('SHUTFILE', "/tmp/shutdown_sdn")
+        self.collection = settings.get('COLLECTION', 'routes')
         self.cleanup_proc = Process(target=self.cleanup,
                                     name='CleanupThread')
         self.cleanup_proc.start()
         client = MongoClient(self.dbhost)
-        if client is None:
-            self.cleanup_proc.terminate()
-            raise OSError('Failed to connect to Mongo')
-        self.routes = client.sdn.routes
+        self.routes = client.sdn[self.collection]
         if self.routes.find_one() is None:
             self.cleanup_proc.terminate()
             raise OSError('DB not initialized')
@@ -63,11 +63,12 @@ class Router:
 
     def cleanup(self):
         client = MongoClient(self.dbhost)
-        if client is None:
-            raise OSError('Failed to connect to Mongo')
-        self.routes = client.sdn.routes
+        self.routes = client.sdn[self.collection]
+        if self.routes.find_one() is None:
+            print("DB not intialized")
+            return -1
         while True:
-            if os.path.exists("/tmp/shutdown_sdn"):
+            if os.path.exists(self.shutdown_file):
                 print("Shut down triggered")
                 return 0
             # Look for expired jobs
@@ -96,9 +97,22 @@ class Router:
                 logging.warn("Job no longer running %s" % (jobid))
                 self.release(route['ip'])
 
+    def _get_slurm(self):
+        p = Popen('squeue -h -t R -o %%A', shell=True,
+                  stdout=PIPE,
+                  stderr=STDOUT)
+        jobs = []
+        for line in p.stdout.readlines():
+            jobs.append(line.rstrip())
+        return jobs
+
     def get_jobs(self):
-        r = requests.get(self.agent)
-        return json.loads(r.text)
+        if self.agent == 'local':
+            jobs = self._get_slurm()
+        else:
+            r = requests.get(self.agent)
+            jobs = json.loads(r.text)
+        return jobs
 
     def _load_mapfile(self, mapfile):
         map = dict()
