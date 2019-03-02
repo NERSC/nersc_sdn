@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.3.3
-%define unmangled_version 0.3.3
+%define version 0.3.4
+%define unmangled_version 0.3.4
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -95,10 +95,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %post server
 %if 0%{?suse_version} < 1
-pip install -y pexpect
+echo "You may need to a pip install pyexpect"
 %endif
 
 %changelog
+* Fri Mar 01 2019 Shane Canon <scanon@lbl.gov> - 0.3.4
+- Fix logging
+
 * Sat Oct 06 2018 Shane Canon <scanon@lbl.gov> - 0.3.3
 - Add local option for job checker
 
@@ -116,4 +119,3 @@ pip install -y pexpect
 
 * Fri Apr 13 2018 Shane Canon <scanon@lbl.gov> - 0.1
 - Initial release
-

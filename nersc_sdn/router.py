@@ -19,7 +19,8 @@ RELEASING = "releasing"
 
 class Router:
     def __init__(self, settings):
-        logging.debug("Initializing Router")
+        self.log = logging.getLogger('gunicorn.error')
+        self.log.debug("Initializing Router")
         self.dbhost = settings['DBHOST']
         self.poll = float(settings['POLLINTERVAL'])
         self.agent = settings['JOBSURL']
@@ -29,7 +30,8 @@ class Router:
         if 'RTRKEY' in settings:
             key = settings['RTRKEY']
         self.map = self._load_mapfile(mapfile)
-        self.vyos = vyos_interface.vyosInterface(user, key=key)
+        expect_log = settings.get('EXPECTLOG', None)
+        self.vyos = vyos_interface.vyosInterface(user, key=key, log=expect_log)
         self.ddns = self._init_dns(settings)
         self.shutdown_file = settings.get('SHUTFILE', "/tmp/shutdown_sdn")
         self.collection = settings.get('COLLECTION', 'routes')
@@ -79,7 +81,7 @@ class Router:
             for route in self.routes.find({'end_time': {'$lt': now},
                                            'status': 'used'}):
                 ip = route['ip']
-                logging.warn("route expired %s" % (ip))
+                self.log.warn("route expired %s" % (ip))
                 self.release(ip)
             # Get jobs, ignore failures
             try:
@@ -96,7 +98,7 @@ class Router:
                 continue
             if route['jobid'] not in running:
                 jobid = route['jobid']
-                logging.warn("Job no longer running %s" % (jobid))
+                self.log.warn("Job no longer running %s" % (jobid))
                 self.release(route['ip'])
 
     def _get_slurm(self):
@@ -159,11 +161,11 @@ class Router:
             raise ValueError('Invalid IP')
         rec = self.routes.find_one({'ip': ip})
         if rec is not None:
-            logging.warn("Already mapped")
+            self.log.warn("Already mapped")
             return rec['address']
         rec = self.routes.find_one({'status': AVAILABLE})
         if rec is None:
-            logging.warn("No available addresses found")
+            self.log.warn("No available addresses found")
             return None
         address = rec['address']
         if 'user' not in data:
@@ -187,6 +189,8 @@ class Router:
         self.routes.update({'address': address}, {'$set': update})
         if self.ddns is not None:
             self.ddns.add_dns(str(data['jobid']), address)
+        self.log.info("mapped %s to %s for user %s job %s" % (ip, address,
+                      data['user'], str(data['jobid'])))
         return address
 
     def release(self, ip):

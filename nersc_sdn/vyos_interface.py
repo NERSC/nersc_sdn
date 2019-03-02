@@ -3,16 +3,20 @@
 import pexpect
 import os
 import logging
+import sys
 
 
 class vyosInterface:
-    def __init__(self, user, key=None):
+    def __init__(self, user, key=None, log=None):
         logging.debug("Initializing VYOS Interface")
         self.user = user
         self.prompt = self.user+"@.*$"
         self.interface = "bond1"
         self.vif = 224
         self.key = key
+        self.log = None
+        if log is not None:
+            self.log = open(log, "a")
 
     def _get_rule(self, address):
         last = int(address.split('.')[3])
@@ -27,7 +31,8 @@ class vyosInterface:
         if self.key is not None:
             key = '-i %s ' % (self.key)
 
-        return pexpect.spawn('ssh %s%s@%s' % (key, self.user, router))
+        return pexpect.spawn('ssh %s%s@%s' % (key, self.user, router),
+                             logfile=self.log)
 
     def add_nat(self, int_add, router, address):
         # Mock stubs
@@ -46,7 +51,7 @@ class vyosInterface:
         # Add interface
         self._sendline(p, "set interfaces bonding %s vif %d address '%s/24'"
                        % (interface, vif, address))
-        self._sendline(p, "commit")
+        self._sendline(p, "commit set interface")
         # Add destination route
         prefix = "set nat destination rule %d" % (rule)
         desc = "1-to-1 NAT for %s to %s" % (int_add, address)
