@@ -2,6 +2,7 @@
 
 import pprint
 from flask import Flask, jsonify, request
+import logging
 import nersc_sdn.router as router
 import auth
 import os
@@ -32,6 +33,12 @@ router = router.Router(application.config)
 auth_mode = application.config['AUTHMODE']
 auth_handler = auth.Authentication({'authentication': auth_mode})
 AUTH_HEADER = 'authentication'
+
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    application.logger.handlers = gunicorn_logger.handlers
+    application.logger.setLevel(gunicorn_logger.level)
 
 
 def shutdown():
