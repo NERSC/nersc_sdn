@@ -1,6 +1,6 @@
 %define name nersc_sdn
-%define version 0.3.4
-%define unmangled_version 0.3.4
+%define version 0.3.5
+%define unmangled_version 0.3.5
 %define release 1
 
 Summary: NERSC's SDN API service to dynamically create routes to HPC compute nodes
@@ -99,6 +99,9 @@ echo "You may need to a pip install pyexpect"
 %endif
 
 %changelog
+* Fri Mar 01 2019 Shane Canon <scanon@lbl.gov> - 0.3.5
+- Change IP release process
+
 * Fri Mar 01 2019 Shane Canon <scanon@lbl.gov> - 0.3.4
 - Fix logging
 
