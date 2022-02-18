@@ -89,6 +89,7 @@ class Router:
                 self.check_jobs(running)
             except:
                 pass
+
             time.sleep(self.poll)
 
     def check_jobs(self, running):
@@ -200,8 +201,10 @@ class Router:
             return 'released'
         update = {
             'status': RELEASING,
+            'ip': None,
         }
-        self.routes.update({'ip': ip}, {'$set': update})
+        address = rec['address']
+        self.routes.update({'address': address}, {'$set': update})
         self.vyos.remove_nat(rec['router'], rec['address'])
         update = {
             'status': AVAILABLE,
@@ -212,7 +215,7 @@ class Router:
             'user': None,
             'uid': None
         }
-        self.routes.update({'ip': ip}, {'$set': update})
+        self.routes.update({'address': address}, {'$set': update})
         if self.ddns is not None:
             self.ddns.del_dns(rec['jobid'])
         return "released"
