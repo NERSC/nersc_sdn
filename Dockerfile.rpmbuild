@@ -1,0 +1,14 @@
+FROM centos:7
+
+RUN yum -y install rpm-build
+ADD . /src/nersc_sdn-0.3.6
+
+RUN \
+   cd /src && \
+   mkdir -p /root/rpmbuild/SOURCES && \
+   tar czf /root/rpmbuild/SOURCES/nersc_sdn-0.3.6.tar.gz nersc_sdn-0.3.6 && \
+   rpmbuild -ba nersc_sdn-0.3.6/nersc_sdn.spec
+
+#ENTRYPOINT [ 'cp' ]
+#CMD [ '/root/rpmbuild/RPMS/noarch/*', '/rpms' ]
+

@@ -10,14 +10,10 @@ Group=sdnapi
 PrivateTmp=true
 PermissionsStartOnly=true
 ExecStart=/usr/bin/gunicorn \
-    -b 0.0.0.0:5000 -t 60 \
-    --access-logfile=/var/log/sdnapi/access.log \
-    --log-file=/var/log/sdnapi/error.log \
+    -c /etc/default/sdnapi.conf \
     nersc_sdn.sdnapi:application
 
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
-
-

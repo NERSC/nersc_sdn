@@ -173,7 +173,6 @@ class Router:
             data['user'] = 'unknown'
         update = {
             'status': ASSIGNING,
-            'ip': ip,
             'router': router,
             'end_time': data['end_time'],
             'user': data['user'],
@@ -185,6 +184,7 @@ class Router:
         self.vyos.add_nat(ip, router, address)
         update = {
             'status': USED,
+            'ip': ip,
             'last_associated': time.time()
         }
         self.routes.update({'address': address}, {'$set': update})
