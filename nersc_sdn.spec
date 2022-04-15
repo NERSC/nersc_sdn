@@ -60,7 +60,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/lib/systemd/system/
 %{__install} -m 0644 sdn_job_server.service %{buildroot}%{_unitdir}/sdn_job_server.service
 %{__install} -m 0644 sdn_api.service %{buildroot}%{_unitdir}/sdn_api.service
 mkdir -p $RPM_BUILD_ROOT/var/log/sdnapi/
-
+mkdir -p $RPM_BUILD_ROOT/etc/default/
+%{__install} -m 0644 sdnapi.conf %{buildroot}/etc/default/sdnapi.conf
 
 
 
@@ -81,6 +82,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{_libexecdir}/nersc_sdn/sdninitdb
 %{_unitdir}/sdn_api.service
+/etc/default/sdnapi.conf
 %dir %attr(700,sdnapi,sdnapi) /var/log/sdnapi
 
 %files jobserver
